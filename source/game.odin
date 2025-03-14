@@ -231,6 +231,20 @@ draw :: proc() {
 		}
 	}
 
+	w := rl.GetScreenWidth()
+	h := rl.GetScreenHeight()
+	for i in (-w/50)..=(w/50) {
+		for j in 0..<NUMBER_OF_ROWS {
+			rl.DrawRectangle(
+				i32((g_mem.cart_track_col + int(i)) * 50) - cart_pos.x + 100,
+				i32(150 + j * 50),
+				50,
+				50,
+				((g_mem.cart_track_col + int(i) + j) % 2 == 0) ? { 245, 190, 132, 128 } : { 240, 171, 98, 175 }
+			)
+		}
+	}
+
 	curr_draw_track_row := NUMBER_OF_ROWS / 2
 	curr_draw_track_col := 0
 	for track in g_mem.tracks {
@@ -253,10 +267,10 @@ draw :: proc() {
 	}
 
 	for obstacle in g_mem.obstacles {
-		rl.DrawRectangle(i32(50 * obstacle[1]) - cart_pos.x + 100, i32(150 + obstacle[0] * 50), 50, 50, rl.BLACK)
+		rl.DrawRectangle(i32(50 * obstacle[1]) - cart_pos.x + 100 + 10, i32(150 + obstacle[0] * 50) + 10, 30, 30, { 111, 63, 3, 255 })
 	}
 
-	rl.DrawRectangle(i32(g_mem.place_track_col * 50) - cart_pos.x + 100, i32(150 + g_mem.place_track_row * 50), 50, 50, { 255, 0, 0, 128 })
+	rl.DrawRectangle(i32(g_mem.place_track_col * 50 + 10) - cart_pos.x + 100, i32(150 + g_mem.place_track_row * 50 + 10), 30, 30, { 255, 0, 0, 128 })
 
 	rl.DrawTextureEx(
 		g_mem.cart_texture,
