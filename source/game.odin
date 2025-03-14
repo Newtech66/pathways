@@ -55,6 +55,7 @@ Game_Memory :: struct {
 	cart_texture: rl.Texture,
 	game_over: bool,
 	score: f32,
+	high_score: f32,
 	speed: f32,
 
 	place_track_row: int,
@@ -110,6 +111,7 @@ update :: proc() {
 	
 		dt := rl.GetFrameTime()
 		g_mem.score += dt
+		g_mem.high_score = max(g_mem.score, g_mem.high_score)
 		g_mem.speed += HORIZONTAL_ACCELERATION * dt
 		loop := true
 		for loop {
@@ -295,8 +297,9 @@ draw :: proc() {
 	// `main_hot_reload.odin`, `main_release.odin` or `main_web_entry.odin`.
 	rl.DrawText(fmt.ctprintf("FPS: %v", rl.GetFPS()), 5, 5, 30, rl.BLACK)
 	rl.DrawText(fmt.ctprintf("Score: %v", i32(g_mem.score)), 250, 5, 30, rl.BLACK)
+	rl.DrawText(fmt.ctprintf("High score: %v", i32(g_mem.high_score)), 500, 5, 30, rl.BLACK)
 	if g_mem.game_over {
-		rl.DrawText("Game over", 500, 5, 30, rl.BLACK)
+		rl.DrawText("Game over", 750, 5, 30, rl.BLACK)
 	}
 
 	rl.EndDrawing()
