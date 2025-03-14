@@ -33,6 +33,12 @@ import "core:math/rand"
 import "core:math/linalg"
 import rl "vendor:raylib"
 
+// Constants
+NUMBER_OF_ROWS :: 9
+INITIAL_HORIZONTAL_VELOCITY :: 300
+HORIZONTAL_ACCELERATION :: 2
+OBSTACLE_PROBABILITY :: 0.15
+
 Track :: enum {
 	Forward,
 	Up,
@@ -61,7 +67,6 @@ Game_Memory :: struct {
 }
 
 g_mem: ^Game_Memory
-NUMBER_OF_ROWS :: 9
 
 update :: proc() {
 	if !g_mem.game_over {
@@ -96,7 +101,7 @@ update :: proc() {
 		}
 		if appended {
 			for i in 0..<NUMBER_OF_ROWS {
-				if rand.float32() < 0.2 {
+				if rand.float32() < OBSTACLE_PROBABILITY {
 					obstacle := [2]int{ i, g_mem.place_track_col + 50 }
 					g_mem.obstacles[obstacle] = {}
 				}
@@ -105,7 +110,7 @@ update :: proc() {
 	
 		dt := rl.GetFrameTime()
 		g_mem.score += dt
-		g_mem.speed += 2 * dt
+		g_mem.speed += HORIZONTAL_ACCELERATION * dt
 		loop := true
 		for loop {
 			switch g_mem.tracks[g_mem.cart_track_index] {
@@ -172,7 +177,7 @@ update :: proc() {
 	if rl.IsKeyPressed(.R) {
 		g_mem.game_over = false
 		g_mem.score = 0
-		g_mem.speed = 150
+		g_mem.speed = INITIAL_HORIZONTAL_VELOCITY
 
 		g_mem.place_track_row = NUMBER_OF_ROWS / 2
 		g_mem.place_track_col = 0
@@ -324,7 +329,7 @@ game_init :: proc() {
 		up_texture = rl.LoadTexture("assets/Up.png"),
 		down_texture = rl.LoadTexture("assets/Down.png"),
 		cart_texture = rl.LoadTexture("assets/Cart.png"),
-		speed = 150,
+		speed = INITIAL_HORIZONTAL_VELOCITY,
 	}
 	for i in 0..<5 {
 		append(&g_mem.tracks, Track.Forward)
