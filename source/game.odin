@@ -110,9 +110,9 @@ update :: proc() {
 		for loop {
 			switch g_mem.tracks[g_mem.cart_track_index] {
 				case .Forward: {
-					track_length : f32 = 100.0
-					if g_mem.cart_track_t + g_mem.speed * dt / track_length >= 1.0 {
-						dt -= (1.0 - g_mem.cart_track_t) * track_length / g_mem.speed
+					horizontal_length : f32 = 100.0
+					if g_mem.cart_track_t + g_mem.speed * dt / horizontal_length >= 1.0 {
+						dt -= (1.0 - g_mem.cart_track_t) * horizontal_length / g_mem.speed
 						if g_mem.cart_track_index == len(g_mem.tracks) - 1 {
 							g_mem.cart_track_t = 1.0
 							loop = false
@@ -123,14 +123,14 @@ update :: proc() {
 							g_mem.cart_track_t = 0.0
 						}
 					} else {
-						g_mem.cart_track_t += g_mem.speed * dt / track_length
+						g_mem.cart_track_t += g_mem.speed * dt / horizontal_length
 						loop = false
 					}
 				}
 				case .Up: {
-					track_length : f32 = 25.0 * math.PI
-					if g_mem.cart_track_t + g_mem.speed * dt / track_length >= 1.0 {
-						dt -= (1.0 - g_mem.cart_track_t) * track_length / g_mem.speed
+					horizontal_length : f32 = 50.0
+					if g_mem.cart_track_t + g_mem.speed * dt / horizontal_length >= 1.0 {
+						dt -= (1.0 - g_mem.cart_track_t) * horizontal_length / g_mem.speed
 						if g_mem.cart_track_index == len(g_mem.tracks) - 1 {
 							g_mem.cart_track_t = 1.0
 							loop = false
@@ -142,14 +142,14 @@ update :: proc() {
 							g_mem.cart_track_t = 0.0
 						}
 					} else {
-						g_mem.cart_track_t += g_mem.speed * dt / track_length
+						g_mem.cart_track_t += g_mem.speed * dt / horizontal_length
 						loop = false
 					}
 				}
 				case .Down: {
-					track_length : f32 = 25.0 * math.PI
-					if g_mem.cart_track_t + g_mem.speed * dt / track_length >= 1.0 {
-						dt -= (1.0 - g_mem.cart_track_t) * track_length / g_mem.speed
+					horizontal_length : f32 = 50.0
+					if g_mem.cart_track_t + g_mem.speed * dt / horizontal_length >= 1.0 {
+						dt -= (1.0 - g_mem.cart_track_t) * horizontal_length / g_mem.speed
 						if g_mem.cart_track_index == len(g_mem.tracks) - 1 {
 							g_mem.cart_track_t = 1.0
 							loop = false
@@ -161,7 +161,7 @@ update :: proc() {
 							g_mem.cart_track_t = 0.0
 						}
 					} else {
-						g_mem.cart_track_t += g_mem.speed * dt / track_length
+						g_mem.cart_track_t += g_mem.speed * dt / horizontal_length
 						loop = false
 					}
 				}
@@ -208,25 +208,27 @@ draw :: proc() {
 			cart_rotation = 0.0
 		}
 		case .Up: {
+			cart_pos.x = i32(g_mem.cart_track_col * 50) + i32(50.0 * g_mem.cart_track_t)
 			if g_mem.cart_track_t < 0.5 {
-				cart_pos.x = i32(g_mem.cart_track_col * 50) + i32(25.0 * math.sin(g_mem.cart_track_t * math.PI))
-				cart_pos.y = i32(150 + g_mem.cart_track_row * 50) + i32(25.0 * math.cos(g_mem.cart_track_t * math.PI))
-				cart_rotation = -g_mem.cart_track_t * math.PI
+				angle := math.asin(50.0 * g_mem.cart_track_t / 25.0)
+				cart_pos.y = i32(150 + g_mem.cart_track_row * 50) + i32(25.0 * math.cos(angle))
+				cart_rotation = -angle
 			} else {
-				cart_pos.x = i32(g_mem.cart_track_col * 50) + 50 - i32(25.0 * math.cos((g_mem.cart_track_t - 0.5) * math.PI))
-				cart_pos.y = i32(150 + g_mem.cart_track_row * 50) - i32(25.0 * math.sin((g_mem.cart_track_t - 0.5) * math.PI))
-				cart_rotation = -(1.0 - g_mem.cart_track_t) * math.PI
+				angle := math.acos(50.0 * (1.0 - g_mem.cart_track_t) / 25.0)
+				cart_pos.y = i32(150 + g_mem.cart_track_row * 50) - i32(25.0 * math.sin(angle))
+				cart_rotation = angle - math.PI / 2
 			}
 		}
 		case .Down: {
+			cart_pos.x = i32(g_mem.cart_track_col * 50) + i32(50.0 * g_mem.cart_track_t)
 			if g_mem.cart_track_t < 0.5 {
-				cart_pos.x = i32(g_mem.cart_track_col * 50) + i32(25.0 * math.sin(g_mem.cart_track_t * math.PI))
-				cart_pos.y = i32(150 + g_mem.cart_track_row * 50) + 50 - i32(25.0 * math.cos(g_mem.cart_track_t * math.PI))
-				cart_rotation = g_mem.cart_track_t * math.PI
+				angle := math.asin(50.0 * g_mem.cart_track_t / 25.0)
+				cart_pos.y = i32(150 + g_mem.cart_track_row * 50) + 50 - i32(25.0 * math.cos(angle))
+				cart_rotation = angle
 			} else {
-				cart_pos.x = i32(g_mem.cart_track_col * 50) + 50 - i32(25.0 * math.cos((g_mem.cart_track_t - 0.5) * math.PI))
-				cart_pos.y = i32(150 + g_mem.cart_track_row * 50) + 50 + i32(25.0 * math.sin((g_mem.cart_track_t - 0.5) * math.PI))
-				cart_rotation = (1.0 - g_mem.cart_track_t) * math.PI
+				angle := math.acos(50.0 * (1.0 - g_mem.cart_track_t) / 25.0)
+				cart_pos.y = i32(150 + g_mem.cart_track_row * 50) + 50 + i32(25.0 * math.sin(angle))
+				cart_rotation = math.PI / 2 - angle
 			}
 		}
 	}
