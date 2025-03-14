@@ -105,7 +105,7 @@ update :: proc() {
 	
 		dt := rl.GetFrameTime()
 		g_mem.score += dt
-		g_mem.speed += dt
+		g_mem.speed += 2 * dt
 		loop := true
 		for loop {
 			switch g_mem.tracks[g_mem.cart_track_index] {
