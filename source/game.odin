@@ -30,7 +30,6 @@ package game
 import "core:fmt"
 import "core:math"
 import "core:math/rand"
-import "core:math/linalg"
 import rl "vendor:raylib"
 
 // Constants
@@ -124,62 +123,62 @@ update :: proc() {
 		loop := true
 		for loop {
 			switch g_mem.tracks[g_mem.cart_track_index] {
-				case .Forward: {
-					horizontal_length : f32 = 100.0
-					if g_mem.cart_track_t + g_mem.speed * dt / horizontal_length >= 1.0 {
-						dt -= (1.0 - g_mem.cart_track_t) * horizontal_length / g_mem.speed
-						if g_mem.cart_track_index == len(g_mem.tracks) - 1 {
-							g_mem.cart_track_t = 1.0
-							loop = false
-							g_mem.game_over = true
-						} else {
-							g_mem.cart_track_col += 2
-							g_mem.cart_track_index += 1
-							g_mem.cart_track_t = 0.0
-						}
-					} else {
-						g_mem.cart_track_t += g_mem.speed * dt / horizontal_length
+			case .Forward: {
+				horizontal_length : f32 = 100.0
+				if g_mem.cart_track_t + g_mem.speed * dt / horizontal_length >= 1.0 {
+					dt -= (1.0 - g_mem.cart_track_t) * horizontal_length / g_mem.speed
+					if g_mem.cart_track_index == len(g_mem.tracks) - 1 {
+						g_mem.cart_track_t = 1.0
 						loop = false
-					}
-				}
-				case .Up: {
-					horizontal_length : f32 = 50.0
-					if g_mem.cart_track_t + g_mem.speed * dt / horizontal_length >= 1.0 {
-						dt -= (1.0 - g_mem.cart_track_t) * horizontal_length / g_mem.speed
-						if g_mem.cart_track_index == len(g_mem.tracks) - 1 {
-							g_mem.cart_track_t = 1.0
-							loop = false
-							g_mem.game_over = true
-						} else {
-							g_mem.cart_track_col += 1
-							g_mem.cart_track_row -= 1
-							g_mem.cart_track_index += 1
-							g_mem.cart_track_t = 0.0
-						}
+						g_mem.game_over = true
 					} else {
-						g_mem.cart_track_t += g_mem.speed * dt / horizontal_length
-						loop = false
+						g_mem.cart_track_col += 2
+						g_mem.cart_track_index += 1
+						g_mem.cart_track_t = 0.0
 					}
+				} else {
+					g_mem.cart_track_t += g_mem.speed * dt / horizontal_length
+					loop = false
 				}
-				case .Down: {
-					horizontal_length : f32 = 50.0
-					if g_mem.cart_track_t + g_mem.speed * dt / horizontal_length >= 1.0 {
-						dt -= (1.0 - g_mem.cart_track_t) * horizontal_length / g_mem.speed
-						if g_mem.cart_track_index == len(g_mem.tracks) - 1 {
-							g_mem.cart_track_t = 1.0
-							loop = false
-							g_mem.game_over = true
-						} else {
-							g_mem.cart_track_col += 1
-							g_mem.cart_track_row += 1
-							g_mem.cart_track_index += 1
-							g_mem.cart_track_t = 0.0
-						}
+			}
+			case .Up: {
+				horizontal_length : f32 = 50.0
+				if g_mem.cart_track_t + g_mem.speed * dt / horizontal_length >= 1.0 {
+					dt -= (1.0 - g_mem.cart_track_t) * horizontal_length / g_mem.speed
+					if g_mem.cart_track_index == len(g_mem.tracks) - 1 {
+						g_mem.cart_track_t = 1.0
+						loop = false
+						g_mem.game_over = true
 					} else {
-						g_mem.cart_track_t += g_mem.speed * dt / horizontal_length
-						loop = false
+						g_mem.cart_track_col += 1
+						g_mem.cart_track_row -= 1
+						g_mem.cart_track_index += 1
+						g_mem.cart_track_t = 0.0
 					}
+				} else {
+					g_mem.cart_track_t += g_mem.speed * dt / horizontal_length
+					loop = false
 				}
+			}
+			case .Down: {
+				horizontal_length : f32 = 50.0
+				if g_mem.cart_track_t + g_mem.speed * dt / horizontal_length >= 1.0 {
+					dt -= (1.0 - g_mem.cart_track_t) * horizontal_length / g_mem.speed
+					if g_mem.cart_track_index == len(g_mem.tracks) - 1 {
+						g_mem.cart_track_t = 1.0
+						loop = false
+						g_mem.game_over = true
+					} else {
+						g_mem.cart_track_col += 1
+						g_mem.cart_track_row += 1
+						g_mem.cart_track_index += 1
+						g_mem.cart_track_t = 0.0
+					}
+				} else {
+					g_mem.cart_track_t += g_mem.speed * dt / horizontal_length
+					loop = false
+				}
+			}
 			}
 		}
 	}
@@ -199,7 +198,7 @@ update :: proc() {
 
 		clear(&g_mem.obstacles)
 		clear(&g_mem.tracks)
-		for i in 0..<5 {
+		for _ in 0..<5 {
 			append(&g_mem.tracks, Track.Forward)
 			g_mem.place_track_col += 2
 		}
@@ -217,35 +216,35 @@ draw :: proc() {
 	cart_pos : [2]i32
 	cart_rotation : f32
 	switch g_mem.tracks[g_mem.cart_track_index] {
-		case .Forward: {
-			cart_pos.x = i32(g_mem.cart_track_col * 50) + i32(100.0 * g_mem.cart_track_t)
-			cart_pos.y = i32(150 + g_mem.cart_track_row * 50 + 25)
-			cart_rotation = 0.0
+	case .Forward: {
+		cart_pos.x = i32(g_mem.cart_track_col * 50) + i32(100.0 * g_mem.cart_track_t)
+		cart_pos.y = i32(150 + g_mem.cart_track_row * 50 + 25)
+		cart_rotation = 0.0
+	}
+	case .Up: {
+		cart_pos.x = i32(g_mem.cart_track_col * 50) + i32(50.0 * g_mem.cart_track_t)
+		if g_mem.cart_track_t < 0.5 {
+			angle := math.asin(50.0 * g_mem.cart_track_t / 25.0)
+			cart_pos.y = i32(150 + g_mem.cart_track_row * 50) + i32(25.0 * math.cos(angle))
+			cart_rotation = -angle
+		} else {
+			angle := math.acos(50.0 * (1.0 - g_mem.cart_track_t) / 25.0)
+			cart_pos.y = i32(150 + g_mem.cart_track_row * 50) - i32(25.0 * math.sin(angle))
+			cart_rotation = angle - math.PI / 2
 		}
-		case .Up: {
-			cart_pos.x = i32(g_mem.cart_track_col * 50) + i32(50.0 * g_mem.cart_track_t)
-			if g_mem.cart_track_t < 0.5 {
-				angle := math.asin(50.0 * g_mem.cart_track_t / 25.0)
-				cart_pos.y = i32(150 + g_mem.cart_track_row * 50) + i32(25.0 * math.cos(angle))
-				cart_rotation = -angle
-			} else {
-				angle := math.acos(50.0 * (1.0 - g_mem.cart_track_t) / 25.0)
-				cart_pos.y = i32(150 + g_mem.cart_track_row * 50) - i32(25.0 * math.sin(angle))
-				cart_rotation = angle - math.PI / 2
-			}
+	}
+	case .Down: {
+		cart_pos.x = i32(g_mem.cart_track_col * 50) + i32(50.0 * g_mem.cart_track_t)
+		if g_mem.cart_track_t < 0.5 {
+			angle := math.asin(50.0 * g_mem.cart_track_t / 25.0)
+			cart_pos.y = i32(150 + g_mem.cart_track_row * 50) + 50 - i32(25.0 * math.cos(angle))
+			cart_rotation = angle
+		} else {
+			angle := math.acos(50.0 * (1.0 - g_mem.cart_track_t) / 25.0)
+			cart_pos.y = i32(150 + g_mem.cart_track_row * 50) + 50 + i32(25.0 * math.sin(angle))
+			cart_rotation = math.PI / 2 - angle
 		}
-		case .Down: {
-			cart_pos.x = i32(g_mem.cart_track_col * 50) + i32(50.0 * g_mem.cart_track_t)
-			if g_mem.cart_track_t < 0.5 {
-				angle := math.asin(50.0 * g_mem.cart_track_t / 25.0)
-				cart_pos.y = i32(150 + g_mem.cart_track_row * 50) + 50 - i32(25.0 * math.cos(angle))
-				cart_rotation = angle
-			} else {
-				angle := math.acos(50.0 * (1.0 - g_mem.cart_track_t) / 25.0)
-				cart_pos.y = i32(150 + g_mem.cart_track_row * 50) + 50 + i32(25.0 * math.sin(angle))
-				cart_rotation = math.PI / 2 - angle
-			}
-		}
+	}
 	}
 
 	screen_width := rl.GetScreenWidth()
@@ -256,7 +255,7 @@ draw :: proc() {
 				i32(150 + j * 50),
 				50,
 				50,
-				((g_mem.cart_track_col + int(i) + j) % 2 == 0) ? { 245, 190, 132, 128 } : { 240, 171, 98, 175 }
+				((g_mem.cart_track_col + int(i) + j) % 2 == 0) ? { 245, 190, 132, 128 } : { 240, 171, 98, 175 },
 			)
 		}
 	}
@@ -265,20 +264,20 @@ draw :: proc() {
 	curr_draw_track_col := 0
 	for track in g_mem.tracks {
 		switch track {
-			case .Forward: {
-				rl.DrawTexture(g_mem.forward_texture, i32(50 * curr_draw_track_col) - cart_pos.x + 100, i32(150 + curr_draw_track_row * 50), rl.WHITE)
-				curr_draw_track_col += 2
-			}
-			case .Up: {
-				rl.DrawTexture(g_mem.up_texture, i32(50 * curr_draw_track_col) - cart_pos.x + 100, i32(150 + curr_draw_track_row * 50 - 50), rl.WHITE)
-				curr_draw_track_row -= 1
-				curr_draw_track_col += 1
-			}
-			case .Down: {
-				rl.DrawTexture(g_mem.down_texture, i32(50 * curr_draw_track_col) - cart_pos.x + 100, i32(150 + curr_draw_track_row * 50), rl.WHITE)
-				curr_draw_track_row += 1
-				curr_draw_track_col += 1
-			}
+		case .Forward: {
+			rl.DrawTexture(g_mem.forward_texture, i32(50 * curr_draw_track_col) - cart_pos.x + 100, i32(150 + curr_draw_track_row * 50), rl.WHITE)
+			curr_draw_track_col += 2
+		}
+		case .Up: {
+			rl.DrawTexture(g_mem.up_texture, i32(50 * curr_draw_track_col) - cart_pos.x + 100, i32(150 + curr_draw_track_row * 50 - 50), rl.WHITE)
+			curr_draw_track_row -= 1
+			curr_draw_track_col += 1
+		}
+		case .Down: {
+			rl.DrawTexture(g_mem.down_texture, i32(50 * curr_draw_track_col) - cart_pos.x + 100, i32(150 + curr_draw_track_row * 50), rl.WHITE)
+			curr_draw_track_row += 1
+			curr_draw_track_col += 1
+		}
 		}
 	}
 
@@ -292,11 +291,11 @@ draw :: proc() {
 		g_mem.cart_texture,
 		{
 			100 - 25 * 1.414 * math.cos(f32(math.PI / 4) + cart_rotation),
-			f32(cart_pos.y) - 25 * 1.414 * math.sin(f32(math.PI / 4) + cart_rotation)
+			f32(cart_pos.y) - 25 * 1.414 * math.sin(f32(math.PI / 4) + cart_rotation),
 		},
 		cart_rotation * 180 / math.PI,
 		1.0,
-		rl.WHITE
+		rl.WHITE,
 	)
 
 	// NOTE: `fmt.ctprintf` uses the temp allocator. The temp allocator is
@@ -343,7 +342,7 @@ game_init :: proc() {
 		speed = INITIAL_HORIZONTAL_VELOCITY,
 		game_music = rl.LoadMusicStream("assets/actuallygood5.mp3"),
 	}
-	for i in 0..<5 {
+	for _ in 0..<5 {
 		append(&g_mem.tracks, Track.Forward)
 		g_mem.place_track_col += 2
 	}
