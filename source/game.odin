@@ -248,9 +248,8 @@ draw :: proc() {
 		}
 	}
 
-	w := rl.GetScreenWidth()
-	h := rl.GetScreenHeight()
-	for i in (-w/50)..=(w/50) {
+	screen_width := rl.GetScreenWidth()
+	for i in (-screen_width/50)..=(screen_width/50) {
 		for j in 0..<NUMBER_OF_ROWS {
 			rl.DrawRectangle(
 				i32((g_mem.cart_track_col + int(i)) * 50) - cart_pos.x + 100,
@@ -303,12 +302,12 @@ draw :: proc() {
 	// NOTE: `fmt.ctprintf` uses the temp allocator. The temp allocator is
 	// cleared at the end of the frame by the main application, meaning inside
 	// `main_hot_reload.odin`, `main_release.odin` or `main_web_entry.odin`.
-	rl.DrawText(fmt.ctprintf("FPS: %v", rl.GetFPS()), 5, 5, 30, rl.BLACK)
-	rl.DrawText(fmt.ctprintf("Score: %v", i32(g_mem.score)), 250, 5, 30, rl.BLACK)
-	rl.DrawText(fmt.ctprintf("High score: %v", i32(g_mem.high_score)), 500, 5, 30, rl.BLACK)
+	rl.DrawText(fmt.ctprintf("Score: %v", i32(g_mem.score)), 5, 5, 30, rl.BLACK)
 	if g_mem.game_over {
-		rl.DrawText("Game over", 750, 5, 30, rl.BLACK)
+		rl.DrawText("Game over", screen_width / 2 - rl.MeasureText("Game over", 30) / 2, 5, 30, rl.BLACK)
 	}
+	high_score_text := fmt.ctprintf("High score: %v", i32(g_mem.high_score))
+	rl.DrawText(high_score_text, screen_width - rl.MeasureText(high_score_text, 30) - 5, 5, 30, rl.BLACK)
 
 	rl.EndDrawing()
 }
