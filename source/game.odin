@@ -83,7 +83,6 @@ music :: proc() {
 		if g_mem.current_music != "game" {
 			rl.StopMusicStream(g_mem.game_music)
 			g_mem.current_music = "game"
-			
 		}
 		if !rl.IsMusicStreamPlaying(g_mem.game_music) {
 			rl.PlayMusicStream(g_mem.game_music)
@@ -223,6 +222,8 @@ update :: proc() {
 	if rl.IsKeyPressed(.ESCAPE) {
 		g_mem.run = false
 	}
+
+	music()
 }
 
 draw :: proc() {
@@ -331,7 +332,6 @@ draw :: proc() {
 game_update :: proc() {
 	update()
 	draw()
-	music()
 }
 
 @(export)
@@ -346,8 +346,6 @@ game_init_window :: proc() {
 
 @(export)
 game_init :: proc() {
-	rl.InitAudioDevice()
-
 	g_mem = new(Game_Memory)
 
 	g_mem^ = Game_Memory {
@@ -361,7 +359,7 @@ game_init :: proc() {
 		speed = INITIAL_HORIZONTAL_VELOCITY,
 		game_music = rl.LoadMusicStream("assets/game_music.mp3"),
 		game_over_music = rl.LoadSound("assets/game_over_music.mp3"),
-		current_music = "game"
+		current_music = "game",
 	}
 
 	for _ in 0..<5 {
