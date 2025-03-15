@@ -325,11 +325,11 @@ game_init_window :: proc() {
 	rl.SetWindowPosition(200, 200)
 	rl.SetTargetFPS(500)
 	rl.SetExitKey(nil)
+	rl.InitAudioDevice()
 }
 
 @(export)
 game_init :: proc() {
-	rl.InitAudioDevice()
 	g_mem = new(Game_Memory)
 
 	g_mem^ = Game_Memory {
