@@ -66,17 +66,33 @@ Game_Memory :: struct {
 	cart_track_t: f32,
 
 	game_music: rl.Music,
+	game_over_music: rl.Sound,
+	current_music: string,
 }
 
 g_mem: ^Game_Memory
 
-update :: proc() {
-	if !rl.IsMusicStreamPlaying(g_mem.game_music) {
-		rl.PlayMusicStream(g_mem.game_music)
+music :: proc() {
+	if g_mem.game_over {
+		if g_mem.current_music != "game_over" {
+			rl.PlaySound(g_mem.game_over_music)
+			g_mem.current_music = "game_over"
+			
+		}
 	} else {
+		if g_mem.current_music != "game" {
+			rl.StopMusicStream(g_mem.game_music)
+			g_mem.current_music = "game"
+			
+		}
+		if !rl.IsMusicStreamPlaying(g_mem.game_music) {
+			rl.PlayMusicStream(g_mem.game_music)
+		}
 		rl.UpdateMusicStream(g_mem.game_music)
 	}
+}
 
+update :: proc() {
 	if !g_mem.game_over {
 		appended := false
 		if rl.IsKeyPressed(.D) {
@@ -315,6 +331,7 @@ draw :: proc() {
 game_update :: proc() {
 	update()
 	draw()
+	music()
 }
 
 @(export)
@@ -329,6 +346,8 @@ game_init_window :: proc() {
 
 @(export)
 game_init :: proc() {
+	rl.InitAudioDevice()
+
 	g_mem = new(Game_Memory)
 
 	g_mem^ = Game_Memory {
@@ -340,8 +359,11 @@ game_init :: proc() {
 		down_texture = rl.LoadTexture("assets/Down.png"),
 		cart_texture = rl.LoadTexture("assets/Cart.png"),
 		speed = INITIAL_HORIZONTAL_VELOCITY,
-		game_music = rl.LoadMusicStream("assets/actuallygood5.mp3"),
+		game_music = rl.LoadMusicStream("assets/game_music.mp3"),
+		game_over_music = rl.LoadSound("assets/game_over_music.mp3"),
+		current_music = "game"
 	}
+
 	for _ in 0..<5 {
 		append(&g_mem.tracks, Track.Forward)
 		g_mem.place_track_col += 2
@@ -362,10 +384,17 @@ game_should_run :: proc() -> bool {
 	return g_mem.run
 }
 
+music_shutdown :: proc() {
+	rl.UnloadMusicStream(g_mem.game_music)
+	rl.UnloadSound(g_mem.game_over_music)
+	rl.CloseAudioDevice()
+}
+
 @(export)
 game_shutdown :: proc() {
 	delete(g_mem.obstacles)
 	delete(g_mem.tracks)
+	music_shutdown()
 	free(g_mem)
 }
 
