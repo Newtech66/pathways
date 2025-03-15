@@ -65,11 +65,19 @@ Game_Memory :: struct {
 	cart_track_row: int,
 	cart_track_col: int,
 	cart_track_t: f32,
+
+	game_music: rl.Music,
 }
 
 g_mem: ^Game_Memory
 
 update :: proc() {
+	if !rl.IsMusicStreamPlaying(g_mem.game_music) {
+		rl.PlayMusicStream(g_mem.game_music)
+	} else {
+		rl.UpdateMusicStream(g_mem.game_music)
+	}
+
 	if !g_mem.game_over {
 		appended := false
 		if rl.IsKeyPressed(.D) {
@@ -322,6 +330,7 @@ game_init_window :: proc() {
 
 @(export)
 game_init :: proc() {
+	rl.InitAudioDevice()
 	g_mem = new(Game_Memory)
 
 	g_mem^ = Game_Memory {
@@ -333,6 +342,7 @@ game_init :: proc() {
 		down_texture = rl.LoadTexture("assets/Down.png"),
 		cart_texture = rl.LoadTexture("assets/Cart.png"),
 		speed = INITIAL_HORIZONTAL_VELOCITY,
+		game_music = rl.LoadMusicStream("assets/actuallygood5.mp3"),
 	}
 	for i in 0..<5 {
 		append(&g_mem.tracks, Track.Forward)
